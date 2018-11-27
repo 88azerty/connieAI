@@ -8,9 +8,9 @@ Conectar ROOT con Tensorflow
 
 # from ROOT import TBranch, TTree, TFile, TChain, TBrowser
 # from ROOT import gROOT
-import uproot       # Se instala con pip install uproot [all]
+import uproot       # Se instala con pip3 install uproot [all]
 import pandas as pd
-import tensorflow as tf # Se instala con pip install tensorflow[all]
+import tensorflow as tf # Se instala con pip3 install tensorflow[all]
 
 iterator = uproot.tree.iterate("../kcikel/10deg/*.root", "hitSumm", reportentries=False) # hitSumm es el nombre del TTree dentro del TFile
 data = pd.DataFrame()
