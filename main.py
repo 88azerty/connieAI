@@ -11,12 +11,15 @@ Conectar ROOT con Tensorflow
 import uproot       # Se instala con pip3 install uproot [all]
 import pandas as pd
 import tensorflow as tf # Se instala con pip3 install tensorflow[all]
+import numpy as np
 
-iterator = uproot.tree.iterate("../kcikel/10deg/*.root", "hitSumm", reportentries=False) # hitSumm es el nombre del TTree dentro del TFile
-data = pd.DataFrame()
+iterator = uproot.tree.iterate( "../kcikel/10deg/*.root",                       # ubicación de los archivos .root
+                                "hitSumm",                                      # nombre del TTree a leer
+                                reportentries=False)
+data = pd.DataFrame()                                                           # creación de DataFrame vacío
 
-for i in iterator:
-    data = data.append(pd.DataFrame.from_dict(i), ignore_index=True)
-    print("Leyendo datos")
+for i in iterator:                                                              # rellenado del DataFrame: Recorre todos los archivos .root
+    data = data.append(pd.DataFrame.from_dict(i), ignore_index=True)            # y los agrega al DataFrame
 
-print(data.describe())
+data = data.reindex(np.random.permutation(data.index))                          # aleatorización del orden de los eventos.
+data.describe()
