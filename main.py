@@ -6,33 +6,20 @@ Conectar ROOT con Tensorflow
 @author: hernanca
 """
 
-from ROOT import TBranch, TTree, TFile, TChain, TBrowser
-from ROOT import gROOT
+# from ROOT import TBranch, TTree, TFile, TChain, TBrowser
+# from ROOT import gROOT
 import uproot
 import math
 import pandas as pd
 import tensorflow as tf
+import numpy as np
 
-gROOT.Reset()
-file1 = TFile("/home/hernanca/MEGAsync/Laboratorio/CONNIE/kcikel/10deg/muon-rank000-CCD-1.fits.root", "READ")
-tree1 = file1.Get("hitSumm")
-file1.Close()
+iterator = uproot.tree.iterate("../kcikel/10deg/*.root", "hitSumm", reportentries=False)
+o = 0
 
-# TODO Usar TChain para combinar múltiples archivos ROOT
+data = pd.DataFrame()
 
-nameBranches = []
-data = {}
-
-for n in range(tree1.GetNbranches()):
-    nameBranches.append(tree1.GetListOfBranches()[n].GetName())    # Get the names of all the branches in the given tree and store them in an array
-
-for name in nameBranches:
-    data[name] = []         # Initialize dict with empty arrays
-
-for event in tree1:
-    for name in nameBranches:
-        runtime = "event." + name
-        print(runtime)
-        data[name].append( event.id )
-
-print(data)
+for i in iterator:
+    data = data.append(pd.DataFrame.from_dict(i), ignore_index=True)
+    print("Leyendo datos")
+print(data.describe())
