@@ -1,0 +1,5 @@
+tree1 = file1.Get("T")
+BranchNames = []                                # para crear un dict después.
+for i in range(tree1.GetNbranches()):
+    print(tree1.GetListOfBranches()[i], "\n")
+    BranchNames.append()
