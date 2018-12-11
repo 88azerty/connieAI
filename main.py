@@ -5,10 +5,7 @@ Created on Mon Nov 26 23:58:14 2018
 Conectar ROOT con Tensorflow
 @author: hernanca
 """
-
-# from ROOT import TBranch, TTree, TFile, TChain, TBrowser
-# from ROOT import gROOT
-import uproot               # Se instala con pip3 install uproot [all]
+import uproot               # Se instala con pip3 install uproot[all]
 import pandas as pd
 import tensorflow as tf     # Se instala con pip3 install tensorflow[all]
 import numpy as np
@@ -16,7 +13,6 @@ import numpy as np
 GammaOrMuon = ["gamma", "muon"]
 Angle = ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"]
 Rank = range(64)
-OneOrTwo = {1: "1", 2: "2"}
 
 data = pd.DataFrame()          # creación de DataFrame vacío
 for k in GammaOrMuon:
@@ -24,7 +20,7 @@ for k in GammaOrMuon:
     for j in Rank:
         FilesToOpen.append("../data/" + Angle[4] + "deg/" + k
                            + "-rank" + str(Rank[j]).zfill(3) + "-CCD-"
-                           + "*.fits.root")
+                           + "*.fits.root")       # * incluye archivos -1 y -2
     iterator = uproot.tree.iterate(FilesToOpen,   # ubicación de archivos .root
                                    "hitSumm",     # nombre del TTree a leer
                                    reportentries=False)
@@ -44,5 +40,21 @@ for k in GammaOrMuon:
 
 data.drop([b"runID", b"ohdu", b"expoStart", b"nSat"], axis=1, inplace=True)
 data = data.reindex(np.random.permutation(data.index))
-print(data.describe(), "\n")
-print(data["target"].describe())
+# se remueven las Series del DataFrame que contienen datos redundantes
+# y se aleatorizan los eventos para asegurar consistencia
+
+print("Lectura de datos finalizada.")
+print("Iniciando el motor de ML.")
+
+MijnFeature = data[[b'flag', b'xMin', b'xMax', b'yMin', b'yMax', b'E0', b'n0',
+                    b'xBary0', b'yBary0', b'xVar0', b'yVar0', b'E1', b'n1',
+                    b'xBary1', b'yBary1', b'xVar1', b'yVar1', b'E2', b'n2',
+                    b'xBary2', b'yBary2', b'xVar2', b'yVar2', b'E3', b'n3',
+                    b'xBary3', b'yBary3', b'xVar3', b'yVar3', b'nSavedPix',
+                    b'xPix', b'yPix', b'level', b'ePix']]
+
+MijnTarget = data["target"]
+MijnOptimizer = tf.train.GradientDescentOptimizer(learning_rate=0.000001)
+MijnOptimizer = tf.contrib.estimator.clip_gradients_by_norm(MijnOptimizer, 5.0)
+
+MijnEstimator = tf.estimator.LinearRegressor(feature_columns=MijnFeature)
