@@ -38,7 +38,10 @@ for k in GammaOrMuon:
 # rellenado del DataFrame: Recorre todos los archivos .root y los agrega al
 # DataFrame. ignore_index evita que el índice se reinicie con cada archivo
 
-data.drop([b"runID", b"ohdu", b"expoStart", b"nSat"], axis=1, inplace=True)
+data.drop([b"runID", b"ohdu", b"expoStart", b"nSat", b"flag", #metadatos
+           b"xMin", b"xMax", b"yMin", b"yMax", #geometria del evento
+           b"xPix", b"yPix", b"level", b"ePix", b"nSavedPix"], #datos cada pixel
+          axis=1, inplace=True)
 data = data.reindex(np.random.permutation(data.index))
 # se remueven las Series del DataFrame que contienen datos redundantes
 # y se aleatorizan los eventos para asegurar consistencia
@@ -46,12 +49,10 @@ data = data.reindex(np.random.permutation(data.index))
 print("Lectura de datos finalizada.")
 print("Iniciando el motor de ML.")
 
-MijnFeature = data[[b'flag', b'xMin', b'xMax', b'yMin', b'yMax', b'E0', b'n0',
-                    b'xBary0', b'yBary0', b'xVar0', b'yVar0', b'E1', b'n1',
-                    b'xBary1', b'yBary1', b'xVar1', b'yVar1', b'E2', b'n2',
-                    b'xBary2', b'yBary2', b'xVar2', b'yVar2', b'E3', b'n3',
-                    b'xBary3', b'yBary3', b'xVar3', b'yVar3', b'nSavedPix',
-                    b'xPix', b'yPix', b'level', b'ePix']]
+MijnFeature = data[[b'E0', b'n0', b'xBary0', b'yBary0', b'xVar0', b'yVar0',
+                    b'E1', b'n1', b'xBary1', b'yBary1', b'xVar1', b'yVar1',
+                    b'E2', b'n2', b'xBary2', b'yBary2', b'xVar2', b'yVar2',
+                    b'E3', b'n3', b'xBary3', b'yBary3', b'xVar3', b'yVar3']]
 
 MijnTarget = data["target"]
 MijnOptimizer = tf.train.GradientDescentOptimizer(learning_rate=0.000001)
